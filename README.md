@@ -18,11 +18,11 @@ spark-common and its libraries (relocated under `me.lucko.spark.lib`), so using 
 <dependency>
     <groupId>ga.windpvp</groupId>
     <artifactId>spark-minestom</artifactId>
-    <version>1.10.165-1</version>
+    <version>1.10.165-2</version>
 </dependency>
 ```
 
-To release, change `releaseVersion` in `spark-minestom/gradle.properties` (for example to `1.10.165-2`) and push. The
+To release, change `releaseVersion` in `spark-minestom/gradle.properties` (for example to `1.10.165-3`) and push. The
 `Minestom` workflow builds every push and commits each version that is not published yet to the `maven` branch, which
 is the repository above. Published versions are never overwritten.
 

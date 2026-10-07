@@ -40,17 +40,6 @@ jobs:
         with:
           gradle-version: "wrapper"
 
-      - name: "spark-common's declared dependencies"
-        run: |
-          BASE=https://repo.lucko.me/me/lucko/spark-common/1.10.165-SNAPSHOT
-          STAMP="$(curl -sSf "$BASE/maven-metadata.xml" | sed -n 's:.*<value>\(.*\)</value>.*:\1:p' | head -1)"
-          echo "spark-common $STAMP"
-          curl -sSf "$BASE/spark-common-$STAMP.pom" | sed -n '/<dependencies>/,/<\/dependencies>/p'
-          for repo in https://repo.lucko.me https://repo.maven.apache.org/maven2 https://central.sonatype.com/repository/maven-snapshots; do
-            echo "$repo: $(curl -s -o /dev/null -w '%{http_code}' "$repo/net/kyori/adventure-text-feature-pagination/maven-metadata.xml")"
-            curl -s "$repo/net/kyori/adventure-text-feature-pagination/maven-metadata.xml" | grep -o '<version>[^<]*</version>' | tail -3
-          done
-
       - name: "Libraries bundled into the jar"
         run: ./gradlew -q :spark-minestom:dependencies --configuration runtimeClasspath
 

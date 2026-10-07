@@ -3,12 +3,13 @@
   <groupId>ga.windpvp</groupId>
   <artifactId>spark-minestom</artifactId>
   <versioning>
-    <latest>1.10.165-2</latest>
-    <release>1.10.165-2</release>
+    <latest>1.10.165-3</latest>
+    <release>1.10.165-3</release>
     <versions>
       <version>1.10.165-1</version>
       <version>1.10.165-2</version>
+      <version>1.10.165-3</version>
     </versions>
-    <lastUpdated>20261007011446</lastUpdated>
+    <lastUpdated>20261007011720</lastUpdated>
   </versioning>
 </metadata>

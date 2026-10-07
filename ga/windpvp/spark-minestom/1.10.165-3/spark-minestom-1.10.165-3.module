@@ -1,0 +1,39 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "ga.windpvp",
+    "module": "spark-minestom",
+    "version": "1.10.165-3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.3.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "shadowRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.jvm.version": 25,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spark-minestom-1.10.165-3.jar",
+          "url": "spark-minestom-1.10.165-3.jar",
+          "size": 6467333,
+          "sha512": "1c49a3ec4e5639c5d8084fc9c4fca722783d9302877acc4754d8afa41174472d185f0ae1af248ed45c155e862c80381d75a3e862b5d42576606d1d740bb2dd6c",
+          "sha256": "a5e9488e91815e1d618afe2a9c1f86fc741ef24096f07856ee2c858fb8e20230",
+          "sha1": "042ce7350c6c4fab55b0ebefdb38b11deeda9b07",
+          "md5": "8e31f17df92cf961fbc624ce18b1fc46"
+        }
+      ]
+    }
+  ]
+}

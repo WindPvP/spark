@@ -30,6 +30,7 @@ dependencies {
     }
 
     compileOnly minestom
+    compileOnly "org.slf4j:slf4j-api:2.0.17"
     implementation("com.google.guava:guava:33.3.1-jre") {
         // annotations only
         exclude group: 'com.google.code.findbugs'
@@ -67,6 +68,15 @@ tasks.named('shadowJar') {
     archiveClassifier = ''
     mergeServiceFiles()
     applyExcludes(it)
+
+    // servers may ship their own versions of these, as the official spark builds assume
+    relocate 'com.google.common', 'me.lucko.spark.lib.guava'
+    relocate 'com.google.thirdparty', 'me.lucko.spark.lib.guava.thirdparty'
+    relocate 'com.google.protobuf', 'me.lucko.spark.lib.protobuf'
+    relocate 'net.bytebuddy', 'me.lucko.spark.lib.bytebuddy'
+    relocate 'org.objectweb.asm', 'me.lucko.spark.lib.asm'
+    relocate 'me.lucko.bytesocks.client', 'me.lucko.spark.lib.bytesocks'
+    relocate 'org.java_websocket', 'me.lucko.spark.lib.bytesocks.ws'
 }
 
 publishing {

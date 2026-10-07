@@ -4,6 +4,27 @@
 		src="https://i.imgur.com/ykHn9vx.png">
 </h1>
 
+# WindPvP build
+
+This fork builds spark-minestom for the WindPvP servers, against the Minestom version they run. The jar bundles
+spark-common and its libraries, so it only needs Minestom (and Maven Central for nothing else):
+
+```xml
+<repository>
+    <id>windpvp-spark</id>
+    <url>https://raw.githubusercontent.com/WindPvP/spark/maven/</url>
+</repository>
+
+<dependency>
+    <groupId>ga.windpvp</groupId>
+    <artifactId>spark-minestom</artifactId>
+    <version>1.10.165-1</version>
+</dependency>
+```
+
+To release, push a `minestom/<version>` tag (for example `minestom/1.10.165-2`). The `Minestom` workflow builds it
+and commits it to the `maven` branch, which is the repository above. Every other push only builds.
+
 # Spark for Minestom
 ```kts
 repositories {

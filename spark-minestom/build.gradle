@@ -3,20 +3,41 @@ import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+// releases are built from minestom/<version> tags, see .github/workflows/minestom-ci.yml
+if (findProperty('releaseVersion')) {
+    version = findProperty('releaseVersion')
 }
 
 tasks.withType(JavaCompile) {
-    // override, compile targeting J21
+    // override, compile targeting J25
     options.release = 25
 }
 
 dependencies {
-    var minestom = "net.minestom:minestom:2026.01.08-1.21.11"
+    // the Minestom version the WindPvP servers run, so API changes fail the build here
+    var minestom = "net.minestom:minestom:2026.10.05-26.2"
 
-    api "me.lucko:spark-common:${project.baseVersion}-SNAPSHOT"
+    api("me.lucko:spark-common:${project.baseVersion}-SNAPSHOT") {
+        // Minestom provides these
+        exclude group: 'net.kyori'
+        exclude group: 'com.google.code.gson'
+        exclude group: 'org.slf4j'
+        exclude group: 'org.jetbrains'
+        exclude group: 'org.checkerframework'
+    }
 
     compileOnly minestom
-    implementation "com.google.guava:guava:33.3.1-jre"
+    implementation("com.google.guava:guava:33.3.1-jre") {
+        // annotations only
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'com.google.errorprone'
+        exclude group: 'com.google.j2objc'
+        exclude group: 'org.checkerframework'
+        exclude group: 'org.jspecify'
+    }
 
     testImplementation minestom
     testImplementation "ch.qos.logback:logback-classic:1.5.28"
@@ -37,25 +58,39 @@ java {
     withSourcesJar()
 }
 
+// The published jar bundles spark-common and the libraries above, so using it only needs Minestom
+tasks.named('jar') {
+    archiveClassifier = 'plain'
+}
+
+tasks.named('shadowJar') {
+    archiveClassifier = ''
+    mergeServiceFiles()
+    applyExcludes(it)
+}
+
 publishing {
     repositories {
+        // the release workflow points this at its checkout of the maven branch
         maven {
-            name = 'hyperaSnapshots'
-            url = 'https://repo.hypera.dev/snapshots/'
-            credentials(PasswordCredentials)
+            name = 'release'
+            url = findProperty('releaseRepository') ? file(findProperty('releaseRepository')) : layout.buildDirectory.dir('repo').get().asFile
         }
     }
 
     publications {
         mavenJava(MavenPublication) {
+            groupId = 'ga.windpvp'
             artifactId = 'spark-minestom'
 
-            from components.java
+            from components.shadow
+            artifact tasks.named('sourcesJar')
+            artifact tasks.named('javadocJar')
 
             pom {
                 name = 'Spark Minestom'
                 description = 'A performance profiler for Minestom servers.'
-                url = 'https://github.com/LooFifteen/spark'
+                url = 'https://github.com/WindPvP/spark'
 
                 licenses {
                     license {
@@ -80,14 +115,14 @@ publishing {
                 }
 
                 scm {
-                    connection = 'scm:git:https://github.com/LooFifteen/spark.git'
-                    developerConnection = 'scm:git:git@github.com:LooFifteen/spark.git'
-                    url = 'https://github.com/LooFifteen/spark'
+                    connection = 'scm:git:https://github.com/WindPvP/spark.git'
+                    developerConnection = 'scm:git:git@github.com:WindPvP/spark.git'
+                    url = 'https://github.com/WindPvP/spark'
                 }
 
                 issueManagement {
                     system = 'GitHub'
-                    url = 'https://github.com/LooFifteen/spark/issues'
+                    url = 'https://github.com/WindPvP/spark/issues'
                 }
             }
         }

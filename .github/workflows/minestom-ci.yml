@@ -49,15 +49,6 @@ jobs:
       - name: "List the published files"
         run: find spark-minestom/build/repo -type f | sort
 
-      - name: "Inspect the async-profiler natives"
-        run: |
-          JAR="$(find spark-minestom/build/libs -name 'spark-minestom-*.jar' ! -name '*-plain.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar')"
-          ls -la "$JAR"
-          unzip -l "$JAR" | grep -E '\.so$|one/profiler/AsyncProfiler\.class|lib/asyncprofiler' || true
-          mkdir natives && unzip -q -o "$JAR" '*.so' -d natives || true
-          find natives -name '*.so' -exec sh -c 'echo "== $1"; strings "$1" | grep -oE "Java_[A-Za-z0-9_]+AsyncProfiler_[A-Za-z0-9_]+" | sort -u | head -5' _ {} \;
-          unzip -l "$JAR" | awk '{print $4}' | grep '/' | cut -d/ -f1-4 | sort -u | head -60
-
       - name: "Check out the maven branch"
         if: startsWith(github.ref, 'refs/tags/minestom/')
         run: |

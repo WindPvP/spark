@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ga.windpvp</groupId>
+  <artifactId>spark-minestom</artifactId>
+  <version>1.10.165-1</version>
+  <name>Spark Minestom</name>
+  <description>A performance profiler for Minestom servers.</description>
+  <url>https://github.com/WindPvP/spark</url>
+  <licenses>
+    <license>
+      <name>GNU General Public License version 3</name>
+      <url>https://opensource.org/license/gpl-3-0</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>lucko</id>
+      <name>Luck</name>
+      <email>git@lucko.me</email>
+      <url>https://lucko.me</url>
+    </developer>
+    <developer>
+      <id>LooFifteen</id>
+      <name>LU15</name>
+      <email>luis@lu15.dev</email>
+      <url>https://lu15.dev</url>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:https://github.com/WindPvP/spark.git</connection>
+    <developerConnection>scm:git:git@github.com:WindPvP/spark.git</developerConnection>
+    <url>https://github.com/WindPvP/spark</url>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/WindPvP/spark/issues</url>
+  </issueManagement>
+</project>

@@ -29,8 +29,15 @@ dependencies {
         exclude group: 'org.checkerframework'
     }
 
-    // the one Adventure module spark-common needs that Minestom does not have
+    // what spark-common needs from Adventure that Minestom does not have: the pagination feature, and the
+    // examination library it implements, which Adventure 5 dropped
     implementation("net.kyori:adventure-text-feature-pagination:4.0.0-SNAPSHOT") {
+        transitive = false
+    }
+    implementation("net.kyori:examination-api:1.3.0") {
+        transitive = false
+    }
+    implementation("net.kyori:examination-string:1.3.0") {
         transitive = false
     }
 
@@ -83,6 +90,7 @@ tasks.named('shadowJar') {
     relocate 'me.lucko.bytesocks.client', 'me.lucko.spark.lib.bytesocks'
     relocate 'org.java_websocket', 'me.lucko.spark.lib.bytesocks.ws'
     relocate 'net.kyori.adventure.text.feature.pagination', 'me.lucko.spark.lib.adventure.pagination'
+    relocate 'net.kyori.examination', 'me.lucko.spark.lib.examination'
     // one.profiler stays: spark's async-profiler natives (spark-native/) bind to Java_one_profiler_AsyncProfiler_*
 }
 

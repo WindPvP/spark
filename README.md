@@ -7,7 +7,7 @@
 # WindPvP build
 
 This fork builds spark-minestom for the WindPvP servers, against the Minestom version they run. The jar bundles
-spark-common and its libraries, so it only needs Minestom (and Maven Central for nothing else):
+spark-common and its libraries (relocated under `me.lucko.spark.lib`), so using it needs nothing but Minestom:
 
 ```xml
 <repository>
@@ -22,8 +22,9 @@ spark-common and its libraries, so it only needs Minestom (and Maven Central for
 </dependency>
 ```
 
-To release, push a `minestom/<version>` tag (for example `minestom/1.10.165-2`). The `Minestom` workflow builds it
-and commits it to the `maven` branch, which is the repository above. Every other push only builds.
+To release, change `releaseVersion` in `spark-minestom/gradle.properties` (for example to `1.10.165-2`) and push. The
+`Minestom` workflow builds every push and commits each version that is not published yet to the `maven` branch, which
+is the repository above. Published versions are never overwritten.
 
 # Spark for Minestom
 ```kts

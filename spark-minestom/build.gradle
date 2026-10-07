@@ -6,7 +6,7 @@ plugins {
     id 'com.gradleup.shadow' version '9.6.1'
 }
 
-// releases are built from minestom/<version> tags, see .github/workflows/minestom-ci.yml
+// set in gradle.properties; the Minestom workflow publishes each new version, see .github/workflows/minestom-ci.yml
 if (findProperty('releaseVersion')) {
     version = findProperty('releaseVersion')
 }

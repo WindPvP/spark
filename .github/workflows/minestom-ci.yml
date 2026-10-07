@@ -1,11 +1,11 @@
 name: Minestom
 
-# Every push builds spark-minestom. Pushing a minestom/<version> tag also publishes that version to the maven
-# branch, which is a Maven repository served from https://raw.githubusercontent.com/WindPvP/spark/maven/
+# Every push builds spark-minestom. When releaseVersion in spark-minestom/gradle.properties is not published yet, the
+# push also publishes it to the maven branch, a Maven repository served from
+# https://raw.githubusercontent.com/WindPvP/spark/maven/. Published versions are never overwritten.
 on:
   push:
     branches: ["**"]
-    tags: ["minestom/*"]
   pull_request:
   workflow_dispatch:
 
@@ -50,27 +50,32 @@ jobs:
         run: find spark-minestom/build/repo -type f | sort
 
       - name: "Check out the maven branch"
-        if: startsWith(github.ref, 'refs/tags/minestom/')
+        id: maven
+        if: github.event_name != 'pull_request'
         run: |
-          VERSION="${GITHUB_REF_NAME#minestom/}"
+          VERSION="$(sed -n 's/^releaseVersion=//p' spark-minestom/gradle.properties)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if git fetch --depth 1 origin maven; then
             git worktree add maven-repo FETCH_HEAD
           else
             git worktree add --orphan -b maven maven-repo
             printf '%s\n' "# WindPvP Maven repository" "" \
-              "Builds of spark-minestom from the minestom/* tags of this repository. Use it as" \
+              "Builds of spark-minestom from this repository, published by the Minestom workflow. Use it as" \
               "\`https://raw.githubusercontent.com/WindPvP/spark/maven/\`." > maven-repo/README.md
           fi
           if [ -e "maven-repo/ga/windpvp/spark-minestom/$VERSION" ]; then
-            echo "::error::spark-minestom $VERSION is already published, tag a new version"
-            exit 1
+            echo "spark-minestom $VERSION is already published"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: "Publish the release"
-        if: startsWith(github.ref, 'refs/tags/minestom/')
+        if: steps.maven.outputs.publish == 'true'
+        env:
+          VERSION: ${{ steps.maven.outputs.version }}
         run: |
-          VERSION="${GITHUB_REF_NAME#minestom/}"
-          ./gradlew :spark-minestom:publish -PreleaseVersion="$VERSION" -PreleaseRepository="$GITHUB_WORKSPACE/maven-repo"
+          ./gradlew :spark-minestom:publish -PreleaseRepository="$GITHUB_WORKSPACE/maven-repo"
           cd maven-repo
           git config user.name "github-actions[bot]"
           git config user.email "41898733+github-actions[bot]@users.noreply.github.com"

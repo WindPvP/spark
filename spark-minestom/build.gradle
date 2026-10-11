@@ -3,20 +3,54 @@ import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+// set in gradle.properties; the Minestom workflow publishes each new version, see .github/workflows/minestom-ci.yml
+if (findProperty('releaseVersion')) {
+    version = findProperty('releaseVersion')
 }
 
 tasks.withType(JavaCompile) {
-    // override, compile targeting J21
+    // override, compile targeting J25
     options.release = 25
 }
 
 dependencies {
-    var minestom = "net.minestom:minestom:2026.01.08-1.21.11"
+    // the Minestom version the WindPvP servers run, so API changes fail the build here
+    var minestom = "net.minestom:minestom:2026.10.05-26.2"
 
-    api "me.lucko:spark-common:${project.baseVersion}-SNAPSHOT"
+    api("me.lucko:spark-common:${project.baseVersion}-SNAPSHOT") {
+        // Minestom provides these
+        exclude group: 'net.kyori'
+        exclude group: 'com.google.code.gson'
+        exclude group: 'org.slf4j'
+        exclude group: 'org.jetbrains'
+        exclude group: 'org.checkerframework'
+    }
+
+    // what spark-common needs from Adventure that Minestom does not have: the pagination feature, and the
+    // examination library it implements, which Adventure 5 dropped
+    implementation("net.kyori:adventure-text-feature-pagination:4.0.0-SNAPSHOT") {
+        transitive = false
+    }
+    implementation("net.kyori:examination-api:1.3.0") {
+        transitive = false
+    }
+    implementation("net.kyori:examination-string:1.3.0") {
+        transitive = false
+    }
 
     compileOnly minestom
-    implementation "com.google.guava:guava:33.3.1-jre"
+    compileOnly "org.slf4j:slf4j-api:2.0.17"
+    implementation("com.google.guava:guava:33.3.1-jre") {
+        // annotations only
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'com.google.errorprone'
+        exclude group: 'com.google.j2objc'
+        exclude group: 'org.checkerframework'
+        exclude group: 'org.jspecify'
+    }
 
     testImplementation minestom
     testImplementation "ch.qos.logback:logback-classic:1.5.28"
@@ -37,25 +71,51 @@ java {
     withSourcesJar()
 }
 
+// The published jar bundles spark-common and the libraries above, so using it only needs Minestom
+tasks.named('jar') {
+    archiveClassifier = 'plain'
+}
+
+tasks.named('shadowJar') {
+    archiveClassifier = ''
+    mergeServiceFiles()
+    applyExcludes(it)
+
+    // servers may ship their own versions of these, as the official spark builds assume
+    relocate 'com.google.common', 'me.lucko.spark.lib.guava'
+    relocate 'com.google.thirdparty', 'me.lucko.spark.lib.guava.thirdparty'
+    relocate 'com.google.protobuf', 'me.lucko.spark.lib.protobuf'
+    relocate 'net.bytebuddy', 'me.lucko.spark.lib.bytebuddy'
+    relocate 'org.objectweb.asm', 'me.lucko.spark.lib.asm'
+    relocate 'me.lucko.bytesocks.client', 'me.lucko.spark.lib.bytesocks'
+    relocate 'org.java_websocket', 'me.lucko.spark.lib.bytesocks.ws'
+    relocate 'net.kyori.adventure.text.feature.pagination', 'me.lucko.spark.lib.adventure.pagination'
+    relocate 'net.kyori.examination', 'me.lucko.spark.lib.examination'
+    // one.profiler stays: spark's async-profiler natives (spark-native/) bind to Java_one_profiler_AsyncProfiler_*
+}
+
 publishing {
     repositories {
+        // the release workflow points this at its checkout of the maven branch
         maven {
-            name = 'hyperaSnapshots'
-            url = 'https://repo.hypera.dev/snapshots/'
-            credentials(PasswordCredentials)
+            name = 'release'
+            url = findProperty('releaseRepository') ? file(findProperty('releaseRepository')) : layout.buildDirectory.dir('repo').get().asFile
         }
     }
 
     publications {
         mavenJava(MavenPublication) {
+            groupId = 'ga.windpvp'
             artifactId = 'spark-minestom'
 
-            from components.java
+            from components.shadow
+            artifact tasks.named('sourcesJar')
+            artifact tasks.named('javadocJar')
 
             pom {
                 name = 'Spark Minestom'
                 description = 'A performance profiler for Minestom servers.'
-                url = 'https://github.com/LooFifteen/spark'
+                url = 'https://github.com/WindPvP/spark'
 
                 licenses {
                     license {
@@ -80,14 +140,14 @@ publishing {
                 }
 
                 scm {
-                    connection = 'scm:git:https://github.com/LooFifteen/spark.git'
-                    developerConnection = 'scm:git:git@github.com:LooFifteen/spark.git'
-                    url = 'https://github.com/LooFifteen/spark'
+                    connection = 'scm:git:https://github.com/WindPvP/spark.git'
+                    developerConnection = 'scm:git:git@github.com:WindPvP/spark.git'
+                    url = 'https://github.com/WindPvP/spark'
                 }
 
                 issueManagement {
                     system = 'GitHub'
-                    url = 'https://github.com/LooFifteen/spark/issues'
+                    url = 'https://github.com/WindPvP/spark/issues'
                 }
             }
         }
